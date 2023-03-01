@@ -16,6 +16,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Builder
 @Entity
+@Table(name = "users")
 public class User {
 
     //  @Column(nullable = false), @Column(length = 100)인 경우 SQL 쪽에서 예외처리를 뱉어낸다.
@@ -33,6 +34,9 @@ public class User {
 
     @Enumerated(value = EnumType.STRING)
     private ERole eRole;
+
+    @OneToOne(mappedBy = "user")
+    private RefreshToken refreshToken;
 
     @CreationTimestamp
     private LocalDateTime createDate;
