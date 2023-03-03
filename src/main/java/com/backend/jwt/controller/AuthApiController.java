@@ -1,17 +1,13 @@
 package com.backend.jwt.controller;
 
 import com.backend.jwt.config.auth.PrincipalDetails;
-import com.backend.jwt.domain.ERole;
 import com.backend.jwt.domain.User;
 import com.backend.jwt.handler.ex.CustomValidationException;
 import com.backend.jwt.repository.UserRepository;
 import com.backend.jwt.service.AuthService;
-import com.backend.jwt.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
