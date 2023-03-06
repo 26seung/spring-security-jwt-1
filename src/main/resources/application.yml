@@ -3,7 +3,7 @@ server:
 
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/jwtDB?serverTimezone=Asia/Seoul&characterEncoding=utf8&autoReconnection=true
+    url: jdbc:mysql://localhost:3306/mysql_jwt?serverTimezone=Asia/Seoul&characterEncoding=utf8&autoReconnection=true
     username: seung
     password: 1234
     driver-class-name: com.mysql.cj.jdbc.Driver
