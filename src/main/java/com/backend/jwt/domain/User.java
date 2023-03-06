@@ -35,9 +35,6 @@ public class User {
     @Enumerated(value = EnumType.STRING)
     private ERole eRole;
 
-    @OneToOne(mappedBy = "user")
-    private RefreshToken refreshToken;
-
     @CreationTimestamp
     private LocalDateTime createDate;
 

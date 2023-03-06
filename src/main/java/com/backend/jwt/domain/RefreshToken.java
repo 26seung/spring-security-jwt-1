@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.redis.core.RedisHash;
 
 import javax.persistence.*;
 
@@ -11,16 +13,12 @@ import javax.persistence.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Entity
-@Table(name = "refreshToken")
+@RedisHash(value = "refreshToken", timeToLive = 600)
 public class RefreshToken {
 
+    //  redis 경우 '스프링프레임위크' 에서 제공하는 @Id 어노테이션을 사용한다.
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    @OneToOne
-    @JoinColumn(name = "userId")
-    private User user;
+    private String userId;
     private String refreshToken;
 
 }
