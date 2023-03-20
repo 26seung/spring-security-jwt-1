@@ -66,3 +66,13 @@ User userEntity = userRepository.findByUsername(username).orElseThrow(()->
 <img width="825" alt="image" src="https://user-images.githubusercontent.com/79305451/220356788-82752263-d884-4d49-8ad3-4c40a1871547.png">
 
 ---
+
+### redid 사용
+
+cli 콘솔을 이용하여 key 조회시 데이터
+
+- redisTemplate 사용 시
+    - <img width="179" alt="image" src="https://user-images.githubusercontent.com/79305451/226169710-022d5282-268c-4173-9296-c711090b8f48.png">
+
+- redisRepository 사용 시
+    - <img width="516" alt="image" src="https://user-images.githubusercontent.com/79305451/226169837-bfc9bbc8-7a09-42d0-9798-5fb90d6fb2db.png">
