@@ -32,10 +32,10 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     //  인증이나 권한이 필요한 주소요청이 있을 시 해당 필터 매서드를 타게 된다.
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        System.out.println("인증이나 권한이 필요함 22========================");
-        System.out.println("인증 권한 doFilterInternal : " + request.getHeader("Authorization"));
-        System.out.println("인증 권한 doFilterInternal : " + request.getCookies());
-        System.out.println("인증이나 권한이 필요함 22========================");
+        System.out.println("JwtAuthorizationFilter (doFilterInternal) ========================");
+        System.out.println("인증 권한 doFilterInternal.getHeader : " + request.getHeader("Authorization"));
+        System.out.println("인증 권한 doFilterInternal.getCookies : " + request.getCookies());
+        System.out.println("JwtAuthorizationFilter (doFilterInternal) ========================");
 
         String jwt = jwtHeader(request);
 
