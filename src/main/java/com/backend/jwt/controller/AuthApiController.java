@@ -4,8 +4,8 @@ import com.backend.jwt.config.auth.PrincipalDetails;
 import com.backend.jwt.domain.User;
 import com.backend.jwt.repository.UserRepository;
 import com.backend.jwt.service.AuthService;
-import com.backend.jwt.service.impl.AuthServiceImpl;
 import com.backend.jwt.service.RefreshTokenService;
+import com.backend.jwt.utils.CookieUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -26,7 +26,7 @@ public class AuthApiController {
 
     private final AuthService authService;
     private final RefreshTokenService refreshTokenService;
-    private final UserRepository userRepository;
+    private final CookieUtils cookieUtils;
 
 
     @GetMapping("/")
@@ -69,14 +69,18 @@ public class AuthApiController {
     @PostMapping("/reissue")
     public ResponseEntity<?> refreshToken(@RequestHeader("Authorization") String accessToken,
                                           @CookieValue(value = "refresh-token") String refreshToken){
-        refreshTokenService.토큰발급(accessToken,refreshToken);
-        return ResponseEntity.status(HttpStatus.OK).header("").body("");
+
+        refreshTokenService.토큰재발급(accessToken, refreshToken);
+        //  생성한 refreshToken 쿠키를 헤더에 담아 전송한다.
+        ResponseCookie responseCookie = cookieUtils.generateRefreshTokenCookie(refreshToken);
+
+        return ResponseEntity.status(HttpStatus.OK).header(HttpHeaders.SET_COOKIE,responseCookie.toString()).body("");
     }
     //  헤더가 Authorization 로 넘어오는 값을 validation. (JWT 의 decode) 하여 해당 토큰이 아직 유효한지를 재검증
     @PostMapping("/check")
     public ResponseEntity<?> checkAccessToken(@RequestHeader("Authorization") String accessToken){
-        Boolean check = refreshTokenService.토큰검증(accessToken);
-        System.out.println("check 실행 .. " + check );
+        refreshTokenService.토큰검증(accessToken);
         return ResponseEntity.status(HttpStatus.OK).body("토큰검증이 완료되었습니다");
     }
+
 }
