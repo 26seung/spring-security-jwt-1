@@ -5,6 +5,7 @@ import com.backend.jwt.handler.jwt.AuthenticationEntryPointImpl;
 import com.backend.jwt.config.jwt.JwtAuthenticationFilter;
 import com.backend.jwt.config.jwt.JwtAuthorizationFilter;
 import com.backend.jwt.repository.UserRepository;
+import com.backend.jwt.service.RefreshTokenService;
 import com.backend.jwt.utils.CookieUtils;
 import com.backend.jwt.utils.JwtUtils;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +32,7 @@ public class SecurityConfig {
     private final AccessDeniedHandlerImpl accessDeniedHandler;
     private final JwtUtils jwtUtils;
     private final CookieUtils cookieUtils;
+    private final RefreshTokenService refreshTokenService;
     //  시큐리티를 사용하기 위해서는 패스워드 암호화가 필요하다.
     //  bean 등롤을 통해 해당 메서드의 리턴되는 오브젝트를 IOC 로 등록해준다.
 
@@ -61,7 +63,7 @@ public class SecurityConfig {
         @Override
         public void configure(HttpSecurity http) throws Exception {
             AuthenticationManager authenticationManager = http.getSharedObject(AuthenticationManager.class);
-            JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(authenticationManager, jwtUtils, cookieUtils);
+            JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(authenticationManager, jwtUtils, cookieUtils,refreshTokenService);
             jwtAuthenticationFilter.setFilterProcessesUrl("/api/auth/login");
 
             http
