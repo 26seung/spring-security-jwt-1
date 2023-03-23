@@ -1,24 +1,34 @@
 package com.backend.jwt.domain;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.backend.jwt.config.jwt.JwtProperties;
+import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
+import org.springframework.data.redis.core.RedisKeyValueAdapter;
+import org.springframework.data.redis.core.TimeToLive;
+import org.springframework.data.redis.core.index.Indexed;
+import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
 
 import javax.persistence.*;
 
 @Data
 @AllArgsConstructor
-@NoArgsConstructor
-@Builder
-@RedisHash(value = "refreshToken", timeToLive = 600)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@RedisHash(value = "refresh_token")
 public class RefreshToken {
 
     //  redis 경우 '스프링프레임위크' 에서 제공하는 @Id 어노테이션을 사용한다.
     @Id
     private String userId;
-    private String refreshToken;
+    @Indexed
+    private String refreshTokenId;
+    @TimeToLive
+    private Long expireTime;
 
+    //  expireTime 값은 refreshToken 의 만료시간을 넣어준다.
+    public RefreshToken(String userId, String refreshTokenId) {
+        this.userId = userId;
+        this.refreshTokenId = refreshTokenId;
+        this.expireTime = JwtProperties.REFRESH_EXPIRATION_TIME;
+    }
 }
