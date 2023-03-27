@@ -2,6 +2,7 @@ package com.backend.jwt.handler;
 
 import com.backend.jwt.dto.CMRespDto;
 import com.backend.jwt.handler.ex.CustomValidationException;
+import com.backend.jwt.handler.ex.RefreshTokenValidationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -17,5 +18,10 @@ public class ControllerExceptionHandler {
     @ExceptionHandler(CustomValidationException.class)
     public ResponseEntity<?> validationException(CustomValidationException e){
         return new ResponseEntity<>(new CMRespDto<>(-1,e.getMessage(), e.getErrorMap()), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(RefreshTokenValidationException.class)
+    public ResponseEntity<?> refreshTokenValidationException(RefreshTokenValidationException e){
+        return new ResponseEntity<>(new CMRespDto<>(-1, e.getMessage(), null), HttpStatus.UNAUTHORIZED);
     }
 }
