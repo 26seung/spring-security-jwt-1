@@ -1,6 +1,7 @@
 package com.backend.jwt.config.jwt;
 
 import com.backend.jwt.config.auth.PrincipalDetails;
+import com.backend.jwt.domain.User;
 import com.backend.jwt.dto.auth.LoginRequestDto;
 import com.backend.jwt.service.RefreshTokenService;
 import com.backend.jwt.utils.CookieUtils;
@@ -65,10 +66,11 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authentication) throws IOException, ServletException {
 
-        PrincipalDetails principalDetails = (PrincipalDetails)authentication.getPrincipal();
-
+//        PrincipalDetails principalDetails = (PrincipalDetails)authentication.getPrincipal();
+        String getUsername = ((PrincipalDetails) authentication.getPrincipal()).getUsername();
+        System.out.println("======[authentication]=============================" + ((PrincipalDetails) authentication.getPrincipal()).getUsername());
         //  쿠키 미사용시
-        String accessToken = jwtUtils.generateAccessToken(principalDetails);
+        String accessToken = jwtUtils.generateAccessToken(getUsername);
         Date expiredTime = jwtUtils.getExpiredTime(accessToken);
         System.out.println("successfulAuthentication 실행 (accessToken) : " + accessToken);
         System.out.println("successfulAuthentication 실행 (accessToken2) : " + jwtUtils.getUserId(accessToken));

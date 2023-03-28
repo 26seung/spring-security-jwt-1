@@ -4,12 +4,8 @@ import com.backend.jwt.config.jwt.JwtProperties;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
-import org.springframework.data.redis.core.RedisKeyValueAdapter;
 import org.springframework.data.redis.core.TimeToLive;
 import org.springframework.data.redis.core.index.Indexed;
-import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
-
-import javax.persistence.*;
 
 @Data
 @AllArgsConstructor
@@ -29,6 +25,6 @@ public class RefreshToken {
     public RefreshToken(String userId, String refreshTokenId) {
         this.userId = userId;
         this.refreshTokenId = refreshTokenId;
-        this.expireTime = JwtProperties.REFRESH_EXPIRATION_TIME;
+        this.expireTime = JwtProperties.REDIS_REFRESH_EXPIRATION_TIME;
     }
 }

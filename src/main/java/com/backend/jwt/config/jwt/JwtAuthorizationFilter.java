@@ -41,7 +41,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
 
         //  JWT 토큰을 검증해서 정상적인 사용자인지 확인
-        System.out.println("doFilterInternal 의 토큰 검증 jwt 1 ============================================ " + jwtUtils.validateToken(jwt));
+//        System.out.println("doFilterInternal 의 토큰 검증 jwt 1 ============================================ " + jwtUtils.validateToken(jwt));
 //        System.out.println("doFilterInternal 의 토큰 검증 valid1 ============================================ " + jwtUtils.validateToken(jwt));
         if (jwt != null && jwtUtils.validateToken(jwt)){
 
