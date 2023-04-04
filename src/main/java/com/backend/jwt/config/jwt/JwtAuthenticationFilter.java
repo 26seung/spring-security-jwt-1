@@ -15,6 +15,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import javax.servlet.*;
@@ -67,6 +68,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authentication) throws IOException, ServletException {
 
 //        PrincipalDetails principalDetails = (PrincipalDetails)authentication.getPrincipal();
+//        System.out.println("principalDetails ---------: " + principalDetails.getUsername());
         String getUsername = ((PrincipalDetails) authentication.getPrincipal()).getUsername();
         System.out.println("======[authentication]=============================" + ((PrincipalDetails) authentication.getPrincipal()).getUsername());
         //  쿠키 미사용시
@@ -98,7 +100,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         //  테스트 쿠키입니다.  //
 
         //  강제로 시큐리티 세션에 접근하여 Authentication 객체를 저장한다.
-        //  SecurityContextHolder.getContext().setAuthentication(authentication);
+//        SecurityContextHolder.getContext().setAuthentication(authentication);
         response.addHeader(JwtProperties.HEADER_STRING,JwtProperties.TOKEN_PREFIX + accessToken);
 
         //  위의 로직까지는 Body 값에는 데이터가 담기지 않고 Header 에만 값이 담기게 된다..

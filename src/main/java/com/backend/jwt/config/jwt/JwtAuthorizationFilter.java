@@ -59,9 +59,11 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
                 //  (String username 의 build 작업에서 토큰에 대한 인증을 완료)
                 Authentication authentication = new UsernamePasswordAuthenticationToken(principalDetails, null, principalDetails.getAuthorities());
                 //  강제로 시큐리티 세션에 접근하여 Authentication 객체를 저장한다.
+                //  @AuthenticationPrincipal 를 통하여 정보를 가져오기 위해서 시큐리티 세션에 저장
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         }
+        System.out.println("JwtAuthorizationFilter (doFilterInternal) ------------------------------");
             //  응답을 안해주면 회원가입시에도 필터를 타기 때문에 진행되지 않음
             filterChain.doFilter(request, response);
     }
