@@ -23,18 +23,29 @@ public class JwtUtils {
 
     private final CookieUtils cookieUtils;
     //  AccessToken 생성
-    public String generateAccessToken(PrincipalDetails principalDetails){
+    public String generateAccessToken(String username){
 
         Date expireTime = new Date(System.currentTimeMillis()+ JwtProperties.ACCESS_EXPIRATION_TIME);
 
         return JWT.create()
-                .withSubject(principalDetails.getUsername())
+                .withSubject(username)
                 .withIssuedAt(new Date())
                 .withExpiresAt(expireTime)
-                .withClaim("id", principalDetails.getUser().getId())
-                .withClaim("username", principalDetails.getUser().getUsername())
+                .withClaim("username", username)
                 .sign(Algorithm.HMAC512(JwtProperties.SECRET));
     }
+//    public String generateAccessToken(PrincipalDetails principalDetails){
+//
+//        Date expireTime = new Date(System.currentTimeMillis()+ JwtProperties.ACCESS_EXPIRATION_TIME);
+//
+//        return JWT.create()
+//                .withSubject(principalDetails.getUsername())
+//                .withIssuedAt(new Date())
+//                .withExpiresAt(expireTime)
+//                .withClaim("id", principalDetails.getUser().getId())
+//                .withClaim("username", principalDetails.getUser().getUsername())
+//                .sign(Algorithm.HMAC512(JwtProperties.SECRET));
+//    }
     //  RefreshToken 생성
     public String generateRefreshToken(){
 
@@ -61,6 +72,12 @@ public class JwtUtils {
     public String getRefreshTokenId(String token) {
         return JWT.decode(token).getSubject();
     }
+    //  넘어온 토큰값과 db에 저장된 토근의 uuid 값을 비교한다.
+    public boolean equalsRefreshTokenId(String refreshToken, String refreshTokenId){
+        String compareToken = getRefreshTokenId(refreshToken);
+        return refreshTokenId.equals(compareToken);
+    }
+
     //  토큰 생성시 사용 메서드
     public String createToken(PrincipalDetails principalDetails){
 
