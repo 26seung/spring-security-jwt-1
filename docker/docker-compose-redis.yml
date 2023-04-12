@@ -29,3 +29,4 @@ services:
 # 종료           : docker-compose -f docker-compose-redis.yml stop
 # 종료 및 삭제     : docker-compose -f docker-compose-redis.yml down
 # 접근           : docker exec -it redis_jwt redis-cli
+# cli 명령어 : 키조회 (key* , scan 0) / 삭제 (flushall)
