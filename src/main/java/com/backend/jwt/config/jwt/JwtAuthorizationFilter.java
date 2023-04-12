@@ -35,6 +35,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         System.out.println("JwtAuthorizationFilter (doFilterInternal) ========================");
         System.out.println("인증 권한 doFilterInternal.getHeader : " + request.getHeader("Authorization"));
         System.out.println("인증 권한 doFilterInternal.getCookies : " + request.getCookies());
+        System.out.println("인증 권한 doFilterInternal.getCookies : " + request.getCookies());
         System.out.println("JwtAuthorizationFilter (doFilterInternal) ========================");
 
         String jwt = jwtHeader(request);
