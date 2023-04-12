@@ -1,12 +1,15 @@
 package com.backend.jwt.controller;
 
 import com.backend.jwt.config.auth.PrincipalDetails;
+import com.backend.jwt.config.jwt.JwtProperties;
 import com.backend.jwt.domain.User;
+import com.backend.jwt.dto.auth.JwtTokenDto;
 import com.backend.jwt.repository.UserRepository;
 import com.backend.jwt.service.AuthService;
 import com.backend.jwt.service.RefreshTokenService;
 import com.backend.jwt.utils.CookieUtils;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
@@ -15,12 +18,14 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 //@CrossOrigin(origins = "*", maxAge = 3000)
 @RequestMapping("/api/auth")
 @RestController
 @RequiredArgsConstructor
+@Slf4j
 public class AuthApiController {
 
 
@@ -34,10 +39,11 @@ public class AuthApiController {
         return "Index";
     }
 
-    @GetMapping("/user")
-    public User user(@AuthenticationPrincipal PrincipalDetails principalDetails){
+    @PostMapping("/user")
+    public String user(@AuthenticationPrincipal PrincipalDetails principalDetails){
         System.out.println("유저페이지 실행 : " + principalDetails);
-        return principalDetails.getUser();
+        log.info("유저페이지 실행 (@AuthenticationPrincipal : {}) ", principalDetails);
+        return "principalDetails.getUser()";
     }
     @GetMapping("/admin")
     public String admin(@AuthenticationPrincipal PrincipalDetails principalDetails){
@@ -53,6 +59,7 @@ public class AuthApiController {
         //  프론트 단에서도 별도의 예외처리를 진행하고, 백단에서도 예외를 처리하여 보안을 강화한다. (혹시나 허용하지 않은 API 요청을 통한 접근에 대한 문제를 막아준다.)
 
         System.out.println("==> Join Controller : " + user);
+        log.info("join run : {}) ", user);
         authService.회원가입(user);
         return ResponseEntity.status(HttpStatus.CREATED).body("회원가입이 완료 되었습니다.");
     }
@@ -61,20 +68,21 @@ public class AuthApiController {
 
     @PostMapping("/logout")
     public ResponseEntity<?> logout(@RequestHeader("Authorization") String accessToken){
-        System.out.println("logout accessToken: " + accessToken);
+        log.info("logout run : {}", accessToken);
+        //  로그아웃에 필요한 비어있는 쿠키값을 가져옴 (문자열)
         String responseCookie = refreshTokenService.로그아웃(accessToken);
-        System.out.println("logout responseCookie: " + responseCookie);
-        return ResponseEntity.status(HttpStatus.OK).header(HttpHeaders.SET_COOKIE,responseCookie).body("로그아웃");
+        return ResponseEntity.status(HttpStatus.OK).header(HttpHeaders.SET_COOKIE, responseCookie).body("로그아웃");
     }
     @PostMapping("/reissue")
     public ResponseEntity<?> refreshToken(@RequestHeader("Authorization") String accessToken,
                                           @CookieValue(value = "refresh-token") String refreshToken){
 
-        refreshTokenService.토큰재발급(accessToken, refreshToken);
+        System.out.println("reissue : " + refreshToken);
+        JwtTokenDto jwtTokenDto = refreshTokenService.토큰재발급(accessToken, refreshToken);
         //  생성한 refreshToken 쿠키를 헤더에 담아 전송한다.
         ResponseCookie responseCookie = cookieUtils.generateRefreshTokenCookie(refreshToken);
 
-        return ResponseEntity.status(HttpStatus.OK).header(HttpHeaders.SET_COOKIE,responseCookie.toString()).body("");
+        return ResponseEntity.status(HttpStatus.OK).header(HttpHeaders.SET_COOKIE, responseCookie.toString()).body(jwtTokenDto);
     }
     //  헤더가 Authorization 로 넘어오는 값을 validation. (JWT 의 decode) 하여 해당 토큰이 아직 유효한지를 재검증
     @PostMapping("/check")
