@@ -1,21 +1,22 @@
 package com.backend.jwt.config.jwt;
 
 import com.backend.jwt.config.auth.PrincipalDetails;
-import com.backend.jwt.domain.User;
+import com.backend.jwt.dto.CMRespDto;
 import com.backend.jwt.dto.auth.LoginRequestDto;
 import com.backend.jwt.service.RefreshTokenService;
 import com.backend.jwt.utils.CookieUtils;
 import com.backend.jwt.utils.JwtUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import javax.servlet.*;
@@ -23,12 +24,12 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
 
 @RequiredArgsConstructor
+@Slf4j
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
     private final AuthenticationManager authenticationManager;
@@ -68,7 +69,6 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authentication) throws IOException, ServletException {
 
 //        PrincipalDetails principalDetails = (PrincipalDetails)authentication.getPrincipal();
-//        System.out.println("principalDetails ---------: " + principalDetails.getUsername());
         String getUsername = ((PrincipalDetails) authentication.getPrincipal()).getUsername();
         System.out.println("======[authentication]=============================" + ((PrincipalDetails) authentication.getPrincipal()).getUsername());
         //  쿠키 미사용시
@@ -101,8 +101,10 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
         //  강제로 시큐리티 세션에 접근하여 Authentication 객체를 저장한다.
 //        SecurityContextHolder.getContext().setAuthentication(authentication);
-        response.addHeader(JwtProperties.HEADER_STRING,JwtProperties.TOKEN_PREFIX + accessToken);
+        //  헤더에 토큰 값을 넣을때 사용
+//        response.addHeader(JwtProperties.HEADER_STRING,JwtProperties.TOKEN_PREFIX + accessToken);
 
+        //  =================================================================
         //  위의 로직까지는 Body 값에는 데이터가 담기지 않고 Header 에만 값이 담기게 된다..
         //  Body 값에 토큰이나, 유저정보를 담기 위해서 `getWriter().write("")` 를 사용하여 전송할 데이터 값을 담아준다.
         //  전송하고자 하는 Body 값만 담아서 데이터를 넘겨준다..
@@ -110,7 +112,6 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         //  Map 을 사용하면 굳이 Dto 를 사용하지 않고 값을 전달 할 수 있다.
-//        LoginResponseDto responseDto = new LoginResponseDto(principalDetails.getUsername(),accessToken,refreshToken);
 
         //  Java 9 이상부터 Map.of() 를 사용하여 간단하게 Map 을 초기화하여 사용할 수 있다.
         //  put(key, value) 형식을 사용하지 않고 그냥 key, value 형식으로 사용 가능. (# 다만 해당 인자는 10개 까지만 사용 가능, 11개는 오류)
@@ -120,9 +121,29 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         );
 
         //  데이터를 JSON 형태로 넘겨주어야 받기 용이하다
-        String userEntity = new ObjectMapper().writeValueAsString(responseBody);
-        PrintWriter out = response.getWriter();
-        out.print(userEntity);
+//        String userEntity = new ObjectMapper().writeValueAsString(responseBody);
+//        PrintWriter out = response.getWriter();
+//        out.print(userEntity);
+
+//        ObjectMapper 사용시 한줄로 간단하게 사용이 가능하다.
+//        new ObjectMapper().writeValue(response.getOutputStream(), responseBody);
+        new ObjectMapper().writeValue(response.getOutputStream(), CMRespDto.successResponse(responseBody));
     }
 
+
+    @Override
+    protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException, ServletException {
+        log.error("unsuccessfulAuthentication failed.getLocalizedMessage(): {}", failed.getLocalizedMessage());
+        System.out.println("unsuccessfulAuthentication ============================" + failed);
+
+        //  실패 상태코드를 날려주지 않으면 성공 상태코드가 날라감.
+        response.setStatus(HttpStatus.UNAUTHORIZED.value());
+
+        Map<String,Object> responseBody = Map.of(
+                "status", HttpStatus.UNAUTHORIZED,
+                "error", failed.getMessage()
+        );
+
+        new ObjectMapper().writeValue(response.getOutputStream(), CMRespDto.errorResponse(failed.getMessage()));
+    }
 }
