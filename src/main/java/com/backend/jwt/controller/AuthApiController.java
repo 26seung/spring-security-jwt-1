@@ -77,7 +77,6 @@ public class AuthApiController {
     public ResponseEntity<?> refreshToken(@RequestHeader("Authorization") String accessToken,
                                           @CookieValue(value = "refresh-token") String refreshToken){
 
-        System.out.println("reissue : " + refreshToken);
         JwtTokenDto jwtTokenDto = refreshTokenService.토큰재발급(accessToken, refreshToken);
         //  생성한 refreshToken 쿠키를 헤더에 담아 전송한다.
         ResponseCookie responseCookie = cookieUtils.generateRefreshTokenCookie(refreshToken);

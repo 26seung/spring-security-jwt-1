@@ -8,6 +8,4 @@ import org.springframework.data.repository.CrudRepository;
 //  ex : hvals refresh_token:test ,  hgetall refresh_token:test
 public interface RefreshTokenRepository extends CrudRepository<RefreshToken, String> {
 
-
-    RefreshToken findByRefreshTokenId(String username);
 }
