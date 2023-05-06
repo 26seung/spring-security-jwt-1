@@ -1,9 +1,13 @@
 package com.backend.jwt.handler;
 
 import com.backend.jwt.dto.CMRespDto;
+import com.backend.jwt.handler.ex.AccessTokenNotValidException;
 import com.backend.jwt.handler.ex.CustomValidationException;
 import com.backend.jwt.handler.ex.RefreshTokenValidationException;
+import com.backend.jwt.utils.CookieUtils;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -20,8 +24,18 @@ public class ControllerExceptionHandler {
         return new ResponseEntity<>(new CMRespDto<>(-1,e.getMessage(), e.getErrorMap()), HttpStatus.BAD_REQUEST);
     }
 
+    //  refreshToken 이 유효하지 않을 경우에는 401에러와 함께 쿠키를 제거
     @ExceptionHandler(RefreshTokenValidationException.class)
     public ResponseEntity<?> refreshTokenValidationException(RefreshTokenValidationException e){
-        return new ResponseEntity<>(new CMRespDto<>(-1, e.getMessage(), null), HttpStatus.UNAUTHORIZED);
+        //  쿠키 제거
+        ResponseCookie responseCookie = new CookieUtils().removeRefreshTokenCookie();
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).header(HttpHeaders.SET_COOKIE, responseCookie.toString()).body(e.getMessage());
+    }
+    @ExceptionHandler(AccessTokenNotValidException.class)
+    public ResponseEntity<?> accessTokenValidationException(AccessTokenNotValidException e){
+        System.out.println("AccessTokenNotValidExceptionAccessTokenNotValidException");
+        //  쿠키 제거
+//        ResponseCookie responseCookie = new CookieUtils().removeRefreshTokenCookie();
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
     }
 }
